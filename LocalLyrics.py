@@ -1,8 +1,8 @@
-from gi.repository import GObject, Gtk, Peas, RB, Gdk, GLib
 import os
 import urllib
+
 import pylrc
-import codecs
+from gi.repository import GObject, Gtk, Peas, RB, Gdk, GLib
 
 
 LocalLyrics_UI = """
@@ -12,6 +12,7 @@ LocalLyrics_UI = """
     </toolbar>
 </ui>
 """
+
 
 class LocalLyrics(GObject.Object, Peas.Activatable):
     __gtype_name__ = 'LocalLyrics'
@@ -26,21 +27,23 @@ class LocalLyrics(GObject.Object, Peas.Activatable):
         self.shell = self.object
         self.sp = self.object.props.shell_player
         self.init_gui()
-        self.shell.add_widget(self.vbox, RB.ShellUILocation.MAIN_BOTTOM, expand=True, fill=True)
+        self.shell.add_widget(
+            self.vbox, RB.ShellUILocation.MAIN_BOTTOM, expand=True, fill=True
+        )
 
         self.lrc_content = None
-        
-        #self.pc_id = self.sp.connect('playing-changed', self.show_Lyrics)
+
+        # self.pc_id = self.sp.connect('playing-changed', self.show_Lyrics)
         self.psc_id = self.sp.connect('playing-song-changed', self.show_Lyrics)
-        #self.ec_id = self.sp.connect('elapsed-changed', self.show_Lyrics)
-        #self.psp_id = self.sp.connect('playing-song-property-changed', self.show_Lyrics)
-    
+        # self.ec_id = self.sp.connect('elapsed-changed', self.show_Lyrics)
+        # self.psp_id = self.sp.connect('playing-song-property-changed', self.show_Lyrics)
+
     def do_deactivate(self):
         self.shell.remove_widget(self.vbox, RB.ShellUILocation.MAIN_BOTTOM)
-        #self.sp.disconnect(self.pc_id)
+        # self.sp.disconnect(self.pc_id)
         self.sp.disconnect(self.psc_id)
-        #self.sp.disconnect(self.ec_id)
-        #self.sp.disconnect(self.psp_id)
+        # self.sp.disconnect(self.ec_id)
+        # self.sp.disconnect(self.psp_id)
 
     def show_Lyrics(self, sp, _):
         song = self.sp.get_playing_entry()
@@ -70,9 +73,11 @@ class LocalLyrics(GObject.Object, Peas.Activatable):
 
             self.newest_index = 0
             self.line_index = 0
-            #self.need_change = True
+            # self.need_change = True
             self.line_num = len(self.lrc_content)
-            Gdk.threads_add_idle(GLib.PRIORITY_DEFAULT_IDLE, self.idle_showLyrics)
+            Gdk.threads_add_idle(
+                GLib.PRIORITY_DEFAULT_IDLE, self.idle_showLyrics
+            )
             return
         else:
             noLyricsFound = True
@@ -80,7 +85,7 @@ class LocalLyrics(GObject.Object, Peas.Activatable):
         self.lrc_content = None
         for i in range(3):
             self.lineBoxes[i].set_markup("")
-        
+
         if noLyricsFound:
             self.line0.set_markup("No Lyrics Found")
 
@@ -91,12 +96,20 @@ class LocalLyrics(GObject.Object, Peas.Activatable):
             current_time = self.sp.get_playing_time()[1]
             if self.line_index == 0:
                 for i in range(3):
-                    self.lineBoxes[i].set_markup("<span foreground=\"Yellow\" size=\"large\">" + self.lrc_content[i].text + "</span>")
+                    self.lineBoxes[i].set_markup(
+                        "<span foreground=\"Yellow\" size=\"large\">"
+                        + self.lrc_content[i].text
+                        + "</span>"
+                    )
                 self.line_index = 2
-            
+
             if current_time > self.lrc_content[self.line_index].time:
                 self.line_index += 1
-                self.lineBoxes[self.newest_index].set_markup("<span foreground=\"Yellow\" size=\"large\">" + self.lrc_content[self.line_index].text + "</span>")
+                self.lineBoxes[self.newest_index].set_markup(
+                    "<span foreground=\"Yellow\" size=\"large\">"
+                    + self.lrc_content[self.line_index].text
+                    + "</span>"
+                )
                 if self.newest_index == 2:
                     self.newest_index = 0
                 else:
@@ -111,7 +124,9 @@ class LocalLyrics(GObject.Object, Peas.Activatable):
         self.line2Box = Gtk.HBox()
 
         self.lryicsLabel = Gtk.Label()
-        self.lryicsLabel.set_markup("<span foreground=\"Green\" size=\"xx-large\">Lyrics Plugin</span><span foreground=\"Cyan\" size=\"small\">\tby zhanshenlc</span>")
+        self.lryicsLabel.set_markup(
+            "<span foreground=\"Green\" size=\"xx-large\">Lyrics Plugin</span><span foreground=\"Cyan\" size=\"small\">\tby zhanshenlc</span>"
+        )
         self.line0 = Gtk.Label()
         self.line1 = Gtk.Label()
         self.line2 = Gtk.Label()
@@ -127,17 +142,24 @@ class LocalLyrics(GObject.Object, Peas.Activatable):
         self.textview.set_wrap_mode(Gtk.WrapMode.WORD)
         self.textbuffer = Gtk.TextBuffer()
         self.textview.set_buffer(self.textbuffer)'''
-        
 
-        self.labelBox.pack_start(self.lryicsLabel, expand=True, fill=True, padding=20)
-        self.line0Box.pack_start(self.line0, expand=True, fill=True, padding=20)
-        self.line1Box.pack_start(self.line1, expand=True, fill=True, padding=20)
-        self.line2Box.pack_start(self.line2, expand=True, fill=True, padding=20)
+        self.labelBox.pack_start(
+            self.lryicsLabel, expand=True, fill=True, padding=20
+        )
+        self.line0Box.pack_start(
+            self.line0, expand=True, fill=True, padding=20
+        )
+        self.line1Box.pack_start(
+            self.line1, expand=True, fill=True, padding=20
+        )
+        self.line2Box.pack_start(
+            self.line2, expand=True, fill=True, padding=20
+        )
         self.vbox.pack_start(self.labelBox, expand=True, fill=True, padding=0)
         self.vbox.pack_start(self.line0Box, expand=True, fill=True, padding=0)
         self.vbox.pack_start(self.line1Box, expand=True, fill=True, padding=0)
         self.vbox.pack_start(self.line2Box, expand=True, fill=True, padding=0)
-        #self.vbox.pack_start(self.textview, expand=True, fill=True, padding=0)
+        # self.vbox.pack_start(self.textview, expand=True, fill=True, padding=0)
         self.vbox.show_all()
 
         self.lineBoxes = [self.line0, self.line1, self.line2]
